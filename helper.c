@@ -1,7 +1,7 @@
 #include"header.h"
 
 UFDT UFDTArr[50];						//object of UFDT structure
-SUPERBLOCK SUPERBLOCKobj;				//object of SUPERBLOCK structure
+SUPERBLOCK SUPERBLOCKobj;					//object of SUPERBLOCK structure
 PINODE head = NULL;						//pointer pointing to first node of DILB
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@ PINODE head = NULL;						//pointer pointing to first node of DILB
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of command from user
 // Output	:	Nothing
-// Description:	It display information about commands used in project		
+// Description	:	It display information about commands used in project		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void man(char *name)
@@ -109,7 +109,7 @@ void man(char *name)
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It display information about commands used in project		
+// Description	:	It display information about commands used in project		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void DisplayHelp()
@@ -137,7 +137,7 @@ void DisplayHelp()
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	It returns file descriptor of file which is of type intger
-// Description:	It is used to get file descriptor from the file name		
+// Description	:	It is used to get file descriptor from the file name		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int GetFDFromName(char *name)
@@ -179,7 +179,7 @@ int GetFDFromName(char *name)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	It returns address of inode structure
-// Description:	It is used to get address of inode structure from file name
+// Description	:	It is used to get address of inode structure from file name
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 PINODE Get_Inode(char *name)
@@ -207,7 +207,7 @@ PINODE Get_Inode(char *name)
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It is used to create DILB
+// Description	:	It is used to create DILB
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void CreateDILB()
@@ -243,7 +243,7 @@ void CreateDILB()
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It is used to initialise contents of superblock
+// Description	:	It is used to initialise contents of superblock
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void InitialiseSuperBlock()
@@ -262,10 +262,10 @@ void InitialiseSuperBlock()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Name		:	CreateFile
 // Author	:	Nalin
-// Input	:	char *name		:	It accepts name of file from user
-//				int permission	:	It accepts which permission should given to file	
+// Input	:	char *name	:	It accepts name of file from user
+//			int permission	:	It accepts which permission should given to file	
 // Output	:	It returns file descriptor of file which is of type integer
-// Description:	It is used to create a file
+// Description	:	It is used to create a file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int CreateFile(char *name, int permission)
@@ -330,7 +330,7 @@ int CreateFile(char *name, int permission)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	Integer
-// Description:	It is used to remove the file
+// Description	:	It is used to remove the file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int rm_File(char *name)
@@ -360,10 +360,10 @@ int rm_File(char *name)
 // Name		:	ReadFile
 // Author	:	Nalin
 // Input	:	int fd		:	It accepts file descriptor of file 
-//				char *arr	:	It is a address of empty buffer
-//				int isize	:	It accepts how many bytes to read
+//			char *arr	:	It is a address of empty buffer
+//			int isize	:	It accepts how many bytes to read
 // Output	:	It returns how many bytes are read successfully
-// Description:	It is used to read file
+// Description	:	It is used to read file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int ReadFile(int fd, char *arr, int isize)
@@ -425,10 +425,10 @@ int ReadFile(int fd, char *arr, int isize)
 // Name		:	WriteFile
 // Author	:	Nalin
 // Input	:	int fd		:	It accepts file descriptor of file
-//				char *arr	:	It accepts address of filled buffer
-//				int isize	:	It accepts how many bytes to write
+//			char *arr	:	It accepts address of filled buffer
+//			int isize	:	It accepts how many bytes to write
 // Output	:	It returns how many bytes are written
-// Description:	It is used to write data into file
+// Description	:	It is used to write data into file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int WriteFile(int fd, char *arr, int isize)
@@ -465,9 +465,9 @@ int WriteFile(int fd, char *arr, int isize)
 // Name		:	OpenFile
 // Author	:	Nalin
 // Input	:	char *name	:	It accepts name of file from user
-//				int mode	:	It accepts in which mode you want to open file
+//			int mode	:	It accepts in which mode you want to open file
 // Output	:	It returns file descriptor of file
-// Description:	It is used to open file
+// Description	:	It is used to open file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int OpenFile(char *name, int mode)
@@ -536,7 +536,7 @@ int OpenFile(char *name, int mode)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	returns 0 if file is closed
-// Description:	It is used to close the file
+// Description	:	It is used to close the file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int CloseFileByName(char *name)
@@ -565,7 +565,7 @@ int CloseFileByName(char *name)
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It is used to close all files
+// Description	:	It is used to close all files
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void CloseAllFile()
@@ -590,8 +590,8 @@ void CloseAllFile()
 // Name		:	LseekFile
 // Author	:	Nalin
 // Input	:	int fd		:	It accepts file descriptor of file
-//				int size	:	It accepts how many bytes to be shift
-//				int from	:	It accepts from where to shift
+//			int size	:	It accepts how many bytes to be shift
+//			int from	:	It accepts from where to shift
 // Output	:	It returns how many bytes are shift
 // Description:	It is used to shift offset of file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -705,7 +705,7 @@ int LseekFile(int fd, int size, int from)
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It is used to display names of file
+// Description	:	It is used to display names of file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ls_file()
@@ -737,7 +737,7 @@ void ls_file()
 // Author	:	Nalin
 // Input	:	Nothing
 // Output	:	Nothing
-// Description:	It is used to display all information of all files
+// Description	:	It is used to display all information of all files
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ls_All()
@@ -769,7 +769,7 @@ void ls_All()
 // Author	:	Nalin
 // Input	:	int fd	:	It accepts file descriptor of file
 // Output	:	It returns 0 if file information is displayed successfully
-// Description:	It is used to display file information
+// Description	:	It is used to display file information
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int fstat_file(int fd)
@@ -817,7 +817,7 @@ int fstat_file(int fd)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	It returns 0 if file information displayed successfully
-// Description:	It is used to display information of file
+// Description	:	It is used to display information of file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int stat_file(char *name)
@@ -881,7 +881,7 @@ int stat_file(char *name)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	Integer
-// Description:	It is used to delete data from file
+// Description	:	It is used to delete data from file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int truncate_File(char *name)
@@ -906,10 +906,10 @@ int truncate_File(char *name)
 // Author	:	Nalin
 // Input	:	int fd	: It accepts file descriptor of file
 // Output	:	Integer
-// Description:	It is used to delete data from file
+// Description	:	It is used to delete data from file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int ftruncate(int fd)
+int Ftruncate(int fd)
 {
 	if ((fd == -1) || (fd > MAXINODE -1))
 	{
@@ -936,7 +936,7 @@ int ftruncate(int fd)
 // Input	:	char *name	:	It accepts name of file from user
 //				int mode	:	It accepts mode to change
 // Output	:	Integer
-// Description:	It is used to change mode of file
+// Description	:	It is used to change mode of file
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int chmod(char *name, int mode)
@@ -984,7 +984,7 @@ int chmod(char *name, int mode)
 // Author	:	Nalin
 // Input	:	char *name	: It accepts name of file from user
 // Output	:	Integer
-// Description:	It is used to display file offset
+// Description	:	It is used to display file offset
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int GetFileOffset(char *name)
@@ -1004,4 +1004,157 @@ int GetFileOffset(char *name)
 	printf("-------------------------------------\n");
 	printf("%d\t\t%d\t\t\n", UFDTArr[fd].ptrfiletable->readoffset, UFDTArr[fd].ptrfiletable->writeoffset);
 	printf("-------------------------------------\n");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	CreateBackup
+// Author	:	Nalin
+// Input	:	Nothing
+// Output	:	Nothing
+// Description	:	It is used to take backup of files
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CreateBackup()
+{
+	int fd, ret;
+	struct inode
+	{
+		char FileName[50];
+		int InodeNumber;
+		int FileSize;
+		int FileActualSize;
+		int FileType;
+		char arr[1024];
+		int LinkCount;
+		int ReferenceCount;
+		int permission;
+	}obj;
+	PINODE temp = head;
+	
+	fd = creat("backup.txt",0700);
+	if(fd == -1)
+	{
+		return;
+	}
+	while(temp != NULL)
+	{
+		if(temp->FileType != 0)
+		{
+			strcpy(obj.FileName,temp->FileName);
+			obj.InodeNumber = temp->InodeNumber;
+			obj.FileSize = temp->FileSize;
+			obj.FileActualSize = temp->FileActualSize;
+			obj.FileType = temp->FileType;
+			obj.LinkCount = temp->LinkCount;
+			obj.ReferenceCount = temp->ReferenceCount;
+			obj.permission = temp->permission;
+			strcpy(obj.arr,temp->Buffer);
+			write(fd, &obj, sizeof(obj));
+			if(ret == -1)
+			{
+				printf("\n Fail in write\n");
+			}
+			memset(&obj,0,sizeof(obj));
+		}
+		temp = temp->next;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	RestoreBackup
+// Author	:	Nalin
+// Input	:	Nothing
+// Output	:	Nothing
+// Description	:	It is used to restore the backup of files
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void RestoreBackup()
+{
+	int filedes, ret, fd;
+	struct inode
+	{
+		char FileName[50];
+		int InodeNumber;
+		int FileSize;
+		int FileActualSize;
+		int FileType;
+		char arr[1024];
+		int LinkCount;
+		int ReferenceCount;
+		int permission;
+	}obj;
+	PINODE temp = head;
+	
+	filedes = open("backup.txt", O_RDONLY);
+	if(filedes == -1)
+	{
+		return;
+	}
+	
+	while(temp != NULL)
+	{
+		ret = read(filedes, &obj, sizeof(obj));
+		if(ret == -1)
+		{
+			return;
+		}
+		if(obj.InodeNumber == temp->InodeNumber)
+		{
+			SUPERBLOCKobj.FreeInode--;
+			fd = obj.InodeNumber - 1;
+			UFDTArr[fd].ptrfiletable = (PFILETABLE)malloc(sizeof(FILETABLE));
+			UFDTArr[fd].ptrfiletable->readoffset = 0;
+			UFDTArr[fd].ptrfiletable->writeoffset = 0;
+			UFDTArr[fd].ptrfiletable->count = 0;
+			UFDTArr[fd].ptrfiletable->mode = obj.permission;
+			UFDTArr[fd].ptrfiletable->ptrinode = temp;
+			strcpy(temp->FileName,obj.FileName);
+			temp->InodeNumber = obj.InodeNumber;
+			temp->FileSize = obj.FileSize;
+			temp->FileActualSize = obj.FileActualSize;
+			temp->FileType = obj.FileType;
+			temp->LinkCount = obj.LinkCount;
+			temp->ReferenceCount = obj.ReferenceCount;
+			temp->permission = obj.permission;
+			temp->Buffer = (char *)malloc(MAXFILESIZE);
+			strcpy(temp->Buffer,obj.arr);
+		}
+		temp = temp->next;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	CheckLoginDetails
+// Author	:	Nalin
+// Input	:	char *user1	:	It accepts address of original username
+//			char *user2	:	It accepts address of user entered username
+//			char *pass1	:	It accepts address of original password
+//			char *pass2	:	It accepts address of user entered password
+// Output	:	BOOL
+//			returns TRUE if username and password is correct
+//			returns FALSE if username and password is incorrect
+// Description	:	It is used to check wheather user entered username and password is correct
+//			or not
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+BOOL CheckLoginDetails	(
+				char *user1,
+				char *user2,
+				char *pass1,
+				char *pass2
+			)
+{
+	if((user1 == NULL) ||  (user2 == NULL) ||(pass1 == NULL) || (pass2 == NULL))
+	{
+		return FALSE;
+	}
+	
+	if(((strcmp(user1, user2)) == 0) && ((strcmp(pass1, pass2)) == 0))
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
 }
