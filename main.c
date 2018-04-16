@@ -7,7 +7,7 @@ int main()
 	char command[4][80], str[80], arr[1024], ch;
 	char Username[10] = "admin", edUsername[10], Password[10] = "admin123", edPassword[10];
 	
-	printf("\nEnter Username : ");
+	/*printf("\nEnter Username : ");
 	scanf("%[^\n]s",edUsername);
 	while(getchar() != '\n');
 	printf("\nEnter Password : ");
@@ -18,12 +18,12 @@ int main()
 	{
 		printf("\nYou have entered wrong credentials\n\n");
 		return -1;
-	}
+	}*/
 
 	InitialiseSuperBlock();
 	CreateDILB();
 	
-	printf("\nRestore previous data ");
+	/*printf("\nRestore previous data ");
 	printf("\nPress 'y' : yes \nPress 'n' : no \n");
 	ch = getchar();
 	while(getchar() != '\n');
@@ -36,14 +36,14 @@ int main()
 	{
 		printf("\n You have entered wrong character\n\n");
 		return -1;
-	}
+	}*/
 
 	while (1)
 	{
 		fflush(stdin);
 		strcpy(str, "");
 
-		printf("\nVirtual File System : >");
+		printf("\nVirtual File System : > ");
 		fgets(str, 80, stdin);
 
 		count = sscanf(str, "%s%s%s%s", command[0], command[1], command[2], command[3]);
@@ -72,7 +72,7 @@ int main()
 			}
 			else if (strcasecmp(command[0], "exit") == 0)
 			{
-				CreateBackup();
+				//CreateBackup();
 				printf("\nTerminating Virtual File System\n\n");
 				break;
 			}

@@ -191,6 +191,17 @@ PINODE Get_Inode(char *name)
 		return NULL;
 	}
 
+	int iCnt = 0;
+	while (name[iCnt] != ' ')
+    {
+        iCnt++;
+    }
+
+    if (iCnt < 11)
+    {
+        name[iCnt] = '\0';
+    }
+
 	while (temp != NULL)
 	{
 		if ((strcmp(name, temp->FileName) == 0) && (temp->FileType != 0))
@@ -236,6 +247,25 @@ void CreateDILB()
 		}
 		i++;
 	}
+	
+	//creating root directory
+	CreateDirectory("/");
+	int fd = OpenDirectory("/", READ+WRITE);
+	char file[12] = "hello";
+	WriteDirectory(fd, file, 2);
+	CreateDirectory(file);
+	int fd2 = OpenDirectory(file, READ+WRITE);
+	char abc[12] = "abc";
+	WriteDirectory(fd2, abc, 3);
+	int a = CreateFile(abc, 3);
+	/*int fd3 = OpenDirectory(abc, READ+WRITE);
+	char pqr[12] = "pqr";
+	WriteDirectory(fd3, pqr, 4);
+	CreateFile(pqr, READ+WRITE)*/;
+	//printf("%d\n",a);
+	char path[] = "/hello/abc/pqr";
+	int inode = namei(path);
+	printf("%d\n",inode);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1007,6 +1037,370 @@ int GetFileOffset(char *name)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	CreateDirectory
+// Author	:	Nalin
+// Input	:	char *name
+// Output	:	Integer
+// Description	:	It is used to create directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int CreateDirectory(char *name)
+{
+	PINODE temp = head;
+	
+	if(name == NULL)
+	{
+		return -1;
+	}
+	
+	if(SUPERBLOCKobj.FreeInode == 0)
+	{
+		return -2;
+	}
+	
+	if (Get_Inode(name) != NULL)
+	{
+		return -3;
+	}
+	
+	(SUPERBLOCKobj.FreeInode)--;
+	
+	while(temp != NULL)
+	{
+		if(temp->FileType == 0)
+		{
+			break;
+		}
+		temp = temp->next;
+	}
+
+	/*while(i < 50)
+	{
+		if(UFDTArr[i].ptrfiletable == NULL)
+		{
+			break;
+		}
+		i++;
+	}
+
+	UFDTArr[i].ptrfiletable = (PFILETABLE) malloc(sizeof(FILETABLE));
+	if(UFDTArr[i].ptrfiletable == NULL)
+	{
+		return -4;
+	}
+
+	UFDTArr[i].ptrfiletable->mode = READ+WRITE;
+	UFDTArr[i].ptrfiletable->count = 1;
+	UFDTArr[i].ptrfiletable->readoffset = 0;
+	UFDTArr[i].ptrfiletable->writeoffset = 0;
+	UFDTArr[i].ptrfiletable->ptrinode = temp;*/
+
+	strcpy(temp->FileName, name);
+	temp->FileType = SPECIAL;
+	temp->LinkCount = 1;
+	temp->FileActualSize = 0;
+	temp->FileSize = MAXFILESIZE;
+	temp->permission = READ + WRITE;
+	temp->Buffer = (char *) malloc(MAXFILESIZE);
+	if(temp->Buffer == NULL)
+	{
+		return -4;
+	}
+	memset(temp->Buffer, 0, sizeof(temp->Buffer));
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	OpenDirectory
+// Author	:	Nalin
+// Input	:	char *name
+// Output	:	Integer
+// Description	:	It is used to open directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int OpenDirectory(char *name, int mode)
+{
+	int i = 0;
+	PINODE temp = NULL;
+
+	if((name == NULL) || (mode <= 0) || (mode > 3))
+	{
+		return -1;
+	}
+
+	int iCnt = 0;
+	while (name[iCnt] != ' ')
+    {
+        iCnt++;
+    }
+
+    if (iCnt < 11)
+    {
+        name[iCnt] = '\0';
+    }
+
+	temp = Get_Inode(name);
+	if(temp == NULL)
+	{
+		return -2;
+	}
+
+	if(temp->permission < mode)
+	{
+		return -3;
+	}
+
+	while(i < 50)
+	{
+		if(UFDTArr[i].ptrfiletable == NULL)
+		{
+			break;
+		}
+		i++;
+	}
+
+	UFDTArr[i].ptrfiletable = (PFILETABLE) malloc(sizeof(FILETABLE));
+	if(UFDTArr[i].ptrfiletable == NULL)
+	{
+		return -4;
+	}
+	UFDTArr[i].ptrfiletable->count = 1;
+	UFDTArr[i].ptrfiletable->mode = mode;
+	UFDTArr[i].ptrfiletable->readoffset = 0;
+	UFDTArr[i].ptrfiletable->writeoffset = 0;
+	UFDTArr[i].ptrfiletable->ptrinode = temp;
+	UFDTArr[i].ptrfiletable->ptrinode->ReferenceCount++;
+	
+	return i;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	ReadDirectory
+// Author	:	Nalin
+// Input	:	int fd
+// Output	:	Integer
+// Description	:	It is used to read directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int ReadDirectory(int fd, char *name)
+{
+	DIRECTORY directory;
+
+	if (UFDTArr[fd].ptrfiletable->ptrinode->FileType != SPECIAL)
+    {
+        return -1;
+    }
+
+	if((UFDTArr[fd].ptrfiletable->mode != READ) && (UFDTArr[fd].ptrfiletable->mode != READ+WRITE))
+	{
+		return -2;
+	}
+
+	if((UFDTArr[fd].ptrfiletable->ptrinode->permission != READ) && (UFDTArr[fd].ptrfiletable->ptrinode->permission != READ+WRITE))
+	{
+		return -3;
+	}
+	
+	if(UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize == 0)
+	{
+		return -4;
+	}
+
+    int iCnt = 0;
+    while(name[iCnt] != ' ')
+    {
+        iCnt++;
+    }
+    name[iCnt] = '\0';
+	//char name[12] = "abc";
+	char arr[1024] = {'\0'};
+	char filename[12] = {'\0'};		//storing filename after getting it from buffer
+	int inode = 0;					//storing inode number after getting it from buffer
+	int len = 0;		//to calculate length of arr
+    //printf("file descriptor : %d\nread offset of %s : %d and write offset of %s : %d\n and file data : %s", fd, UFDTArr[fd].ptrfiletable->ptrinode->FileName, UFDTArr[fd].ptrfiletable->readoffset, UFDTArr[fd].ptrfiletable->ptrinode->FileName, UFDTArr[fd].ptrfiletable->writeoffset, UFDTArr[fd].ptrfiletable->ptrinode->Buffer);
+	while(/*(UFDTArr[fd].ptrfiletable->readoffset != UFDTArr[fd].ptrfiletable->writeoffset) //Checking writeoffset is not equal to readoffset
+			&& */
+            (UFDTArr[fd].ptrfiletable->readoffset != UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize)
+                    &&
+		(UFDTArr[fd].ptrfiletable->readoffset != MAXFILESIZE)) //Checking readoffset is not equal to MAXFILESIZE
+	{
+		strcat(arr, (UFDTArr[fd].ptrfiletable->ptrinode->Buffer) + (UFDTArr[fd].ptrfiletable->readoffset)); //getting data from buffer and concating into arr
+		UFDTArr[fd].ptrfiletable->readoffset = UFDTArr[fd].ptrfiletable->readoffset + 16; //increasing readoffset by 16 as each entry is of 16byte
+	}
+
+	//printf(arr);
+
+	if(name == NULL) //to get all file and directory name from directory
+	{
+
+	}
+	else //to get specific file or directory inode number
+	{
+		UFDTArr[fd].ptrfiletable->readoffset = 0; //setting readoffset to zero to traverse again
+		len = strlen(arr);
+        //printf("%s->\n\n",arr);
+		while(/*(UFDTArr[fd].ptrfiletable->readoffset != UFDTArr[fd].ptrfiletable->writeoffset) //Checking writeoffset is not equal to readoffset
+				&&*/
+                (UFDTArr[fd].ptrfiletable->readoffset != UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize)
+                        &&
+			(UFDTArr[fd].ptrfiletable->readoffset != len)) //Checking readoffset is not equal to length of arr
+		{
+			//getting filename and inode number from arr seperately
+			sscanf(arr+UFDTArr[fd].ptrfiletable->readoffset, "%s %d", filename, &inode);
+			//printf("%s\n\n",arr);
+			UFDTArr[fd].ptrfiletable->readoffset = UFDTArr[fd].ptrfiletable->readoffset + 12; //increaing offset by 12 because integer 4 byte got into a single byte using sscanf
+			if(strcmp(filename, name) == 0)
+			{
+				break;
+			}
+		}
+
+		if(UFDTArr[fd].ptrfiletable->readoffset != len)	//if file or directory present
+		{
+			//printf("%s -> %d",filename, inode);
+            return inode;
+		}
+		else if((name != NULL) && (UFDTArr[fd].ptrfiletable->readoffset == len) //if file or directory is not present
+				&& 
+				(UFDTArr[fd].ptrfiletable->readoffset != MAXFILESIZE))
+		{
+			if(strcmp(filename, name) == 0) //if file or directory is last then also lenght of arr is same as readoffset so checking that the file we searching is last or not
+			{
+				//printf("%s -> %d",filename, inode);
+				return inode;
+			}
+			//printf("Not Found");
+            //printf("%s->%s\n",filename,name);
+            return -5;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	WriteDirectory
+// Author	:	Nalin
+// Input	:	int fd, char *name
+// Output	:	Integer
+// Description	:	It is used to write into directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int WriteDirectory(int fd, char *name, int inodeNo)
+{
+	int i = 0;
+	PINODE temp = head;
+	DIRECTORY directory;
+
+	if(UFDTArr[fd].ptrfiletable == NULL)
+	{
+		return -1;
+	}
+
+	if(UFDTArr[fd].ptrfiletable->mode == READ)
+	{
+		return -2;
+	}
+
+	if(UFDTArr[fd].ptrfiletable->ptrinode->permission == READ)
+	{
+		return -3;
+	}
+
+	if(UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize == MAXFILESIZE)
+	{
+		return -4;
+	}
+	
+	int length = strlen(name);
+	while(length != 11)
+	{
+		name[length] = ' ';
+		length++;
+	}
+	strcpy(directory.FileName, name);
+	directory.InodeNumber = inodeNo;
+
+	char arr[16];
+
+	snprintf(arr, 16, "%s%d", directory.FileName, directory.InodeNumber);
+	strncpy(((UFDTArr[fd].ptrfiletable->ptrinode->Buffer) + (UFDTArr[fd].ptrfiletable->writeoffset)), arr, 16);
+	UFDTArr[fd].ptrfiletable->writeoffset = UFDTArr[fd].ptrfiletable->writeoffset + 16;
+	UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize = UFDTArr[fd].ptrfiletable->ptrinode->FileActualSize + 16;
+	
+	return 0;
+	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	namei
+// Author	:	Nalin
+// Input	:	char *path
+// Output	:	
+// Description	:	It is used to get inode from name
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int namei(char *path)
+{
+	if(path == NULL)
+	{
+		return -1;
+	}
+	
+	char *name = NULL, *temp = NULL;
+	int fd = 0;
+	int inode = 0;
+	const char delimiters[2] = "/";
+	
+	if(*path == '/')
+	{
+	    fd = 0;
+	}
+
+    name = strtok(path, delimiters);
+
+	while (name != NULL)
+    {
+        inode = ReadDirectory(fd, name);
+        if (inode == -1)    //If it is not directory
+        {
+            break;
+        }
+        else if (inode == -5)   //if file or directory does not exits
+        {
+            break;
+        }
+        if (fd == 0)
+        {
+            fd = OpenDirectory(name, READ+WRITE);
+            if(fd < 0)
+            {
+                break;
+            }
+            //continue;
+        }
+        fd = OpenDirectory(name, READ+WRITE);
+
+        name = strtok(NULL, delimiters);   //getting next component
+    }
+
+    if (name == NULL)   //the required file is exists like /A/B/Demo.txt
+    {
+        return inode;
+    }
+    else if (name != NULL)      //If loops break
+    {
+        temp = name;
+        temp = strtok(NULL, "/");   //getting next component
+        if(temp != NULL)        //If there is a next component then the user has entered wrong path
+        {
+            //printf("%s\n\n",temp);
+            return -2;
+        }
+        //logic to create a file or directory
+        return inode;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Name		:	CreateBackup
 // Author	:	Nalin
 // Input	:	Nothing
@@ -1016,7 +1410,7 @@ int GetFileOffset(char *name)
 
 void CreateBackup()
 {
-	int fd, ret;
+	/*int fd, ret;
 	struct inode
 	{
 		char FileName[50];
@@ -1057,7 +1451,7 @@ void CreateBackup()
 			memset(&obj,0,sizeof(obj));
 		}
 		temp = temp->next;
-	}
+	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1070,7 +1464,7 @@ void CreateBackup()
 
 void RestoreBackup()
 {
-	int filedes, ret, fd;
+	/*int filedes, ret, fd;
 	struct inode
 	{
 		char FileName[50];
@@ -1120,7 +1514,7 @@ void RestoreBackup()
 			strcpy(temp->Buffer,obj.arr);
 		}
 		temp = temp->next;
-	}
+	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1144,7 +1538,7 @@ BOOL CheckLoginDetails	(
 				char *pass2
 			)
 {
-	if((user1 == NULL) ||  (user2 == NULL) ||(pass1 == NULL) || (pass2 == NULL))
+	/*if((user1 == NULL) ||  (user2 == NULL) ||(pass1 == NULL) || (pass2 == NULL))
 	{
 		return FALSE;
 	}
@@ -1156,5 +1550,5 @@ BOOL CheckLoginDetails	(
 	else
 	{
 		return FALSE;
-	}
+	}*/
 }

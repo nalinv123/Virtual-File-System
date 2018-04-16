@@ -52,6 +52,12 @@ typedef struct ufdt
 	PFILETABLE ptrfiletable;
 }UFDT;
 
+typedef struct directory
+{
+	char FileName[12];
+	int InodeNumber;
+}DIRECTORY, *PDIRECTORY;
+
 void CreateDILB();
 void InitialiseSuperBlock();
 void ls_file();
@@ -74,6 +80,11 @@ int Ftruncate(int);
 int LseekFile(int, int, int);
 int GetFileOffset(char *);
 int chmod(char *, int);
+int CreateDirectory(char *);
+int OpenDirectory(char *, int);
+int ReadDirectory(int, char *);
+int WriteDirectory(int, char *, int);
+int namei(char *);
 void CreateBackup();
 void RestoreBackup();
 BOOL CheckLoginDetails(char *, char *, char *, char *);
