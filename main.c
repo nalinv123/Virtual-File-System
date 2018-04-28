@@ -138,12 +138,18 @@ int main()
 			}
 			else if (strcasecmp(command[0], "write") == 0)
 			{
-				fd = GetFDFromName(command[1]);
+				/*fd = GetFDFromName(command[1]);
 				if (fd == -1)
 				{
 					printf("\nERROR : Incorrect parameter\n");
 					continue;
-				}
+				}*/
+                fd = OpenFile(command[1], READ+WRITE);
+                if (fd < 0)
+                {
+                    printf("\nERROR : Wrong path\n");
+                    continue;
+                }
 				printf("Enter the data :\n");
 				scanf("%[^\n]s", arr);
 
@@ -237,7 +243,7 @@ int main()
 				{
 					printf("\nERROR : File already exists\n");
 				}
-				if (ret == -4)
+				if (ret == -6)
 				{
 					printf("\nERROR : Memory allocation failure\n");
 				}
@@ -271,16 +277,26 @@ int main()
 				{
 					printf("\nERROR : Resources are finished\n");
 				}
+				if (ret == -6)
+				{
+					printf("\nERROR : It is directory\n");
+				}
 				continue;
 			}
 			else if (strcasecmp(command[0], "read") == 0)
 			{
-				fd = GetFDFromName(command[1]);
+				/*fd = GetFDFromName(command[1]);
 				if (fd == -1)
 				{
 					printf("\nERROR : Incorrect parameters\n");
 					continue;
-				}
+				}*/
+				fd = OpenFile(command[1], READ);
+				if (fd < 0)
+                {
+                    printf("\nERROR : Wrong path\n");
+                    continue;
+                }
 				if (atoi(command[2]) > MAXFILESIZE)
 				{
 					printf("\nERROR : File size too large\n");
@@ -316,6 +332,7 @@ int main()
 				if (ret > 0)
 				{
 					write(2, ptr, ret);
+					printf("\n");
 				}
 				continue;
 			}
