@@ -3,6 +3,7 @@
 UFDT UFDTArr[50];						//object of UFDT structure
 SUPERBLOCK SUPERBLOCKobj;					//object of SUPERBLOCK structure
 PINODE head = NULL;						//pointer pointing to first node of DILB
+char currentDirectory[80] = {'\0'};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Name		:	man
@@ -251,12 +252,13 @@ void CreateDILB()
 	//creating root directory
 	CreateDirectory("/");
 	OpenDirectory("/", READ+WRITE);
+	strcpy(currentDirectory, "/");
 	char abc[] = "/abc";
 	CreateDirectory(abc);
 	char pqr[] = "/abc/pqr";
 	int iRet = CreateDirectory(pqr);
-	char xyx[] = "/abc/pqr/xyz";
-	CreateFile(xyx, 3);
+	//char xyx[] = "/abc/pqr/xyz";
+	//CreateFile(xyx, 3);
 	//int fd = OpenFile("/abc/pqr/xyz", 3);
 	//printf("%d\n", fd);
 	/*int fd = OpenDirectory("/", READ+WRITE);
@@ -835,7 +837,74 @@ int LseekFile(int fd, int size, int from)
 
 void ls_file()
 {
-	PINODE temp = head;
+    char arr[1024] = {'\0'};
+    char filename[12] = {'\0'};
+    int inode = 0, len = 0, fd = 0;
+    char path[80] = {'\0'};
+    PINODE temp = NULL;
+
+    if ((*currentDirectory == '/') && (*(currentDirectory + 1) == '\0'))
+    {
+        ReadDirectory(0, arr);
+    }
+    else
+    {
+    	strcpy(path, currentDirectory);
+		inode = namei(path);
+		if (inode < 0)
+        {
+            printf("\nERROR : Wrong path\n");
+            return;
+        }
+
+        temp = iget(inode);
+		if (temp == NULL)
+        {
+            printf("\nERROR : Inode not found\n");
+            return;
+        }
+
+        while (fd < 50)
+        {
+            if (UFDTArr[fd].ptrfiletable == NULL)
+            {
+                break;
+            }
+            fd++;
+        }
+
+        if (fd == 50)
+        {
+            printf("\nERROR : UFDT Full\n");
+            return;
+        }
+
+        UFDTArr[fd].ptrfiletable = (PFILETABLE) malloc(sizeof(FILETABLE));
+
+        UFDTArr[fd].ptrfiletable->readoffset = 0;
+		UFDTArr[fd].ptrfiletable->writeoffset = 0;
+		UFDTArr[fd].ptrfiletable->count = 1;
+		UFDTArr[fd].ptrfiletable->mode = READ;
+		UFDTArr[fd].ptrfiletable->ptrinode = temp;
+
+		ReadDirectory(fd, arr);
+    }
+
+	len = strlen(arr);
+	UFDTArr[0].ptrfiletable->readoffset = 0;
+	while ((UFDTArr[0].ptrfiletable->readoffset != len) && (UFDTArr[0].ptrfiletable->readoffset != MAXFILESIZE))
+	{
+		sscanf(arr+UFDTArr[0].ptrfiletable->readoffset, "%s ", filename);
+		printf("%s\n", filename);
+		UFDTArr[0].ptrfiletable->readoffset = UFDTArr[0].ptrfiletable->readoffset + 12;
+	}
+
+	if (fd > 0)
+    {
+        close(fd);
+    }
+
+	/*PINODE temp = head;
 
 	if (SUPERBLOCKobj.FreeInode == MAXINODE)
 	{
@@ -854,7 +923,7 @@ void ls_file()
 		}
 		temp = temp->next;
 	}
-	printf("----------------------------------------------------------\n");
+	printf("----------------------------------------------------------\n");*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1370,9 +1439,10 @@ int ReadDirectory(int fd, char *name)
 
 	//printf(arr);
 
-	if(name == NULL) //to get all file and directory name from directory
+	if(*name == '\0') //to get all file and directory name from directory
 	{
-
+        strcpy(name, arr);
+        return 0;
 	}
 	else //to get specific file or directory inode number
 	{
@@ -1479,6 +1549,21 @@ int WriteDirectory(int fd, char *name, int inodeNo)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void CloseDirectory(int fd)
+{
+    UFDTArr[fd].ptrfiletable->ptrinode->ReferenceCount--;
+    free(UFDTArr[fd].ptrfiletable);
+    UFDTArr[fd].ptrfiletable = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:   CloseFile
+// Author	:	Nalin
+// Input	:	int fd
+// Output	:	Nothing
+// Description	:	It is used to close an open file
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CloseFile(int fd)
 {
     UFDTArr[fd].ptrfiletable->ptrinode->ReferenceCount--;
     free(UFDTArr[fd].ptrfiletable);
@@ -1636,11 +1721,38 @@ PINODE iget(int inode)
     {
         return NULL;
     }
-    if (temp->FileType != REGULAR)
+    /*if (temp->FileType != REGULAR)
     {
         return NULL;
-    }
+    }*/
     return temp;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	ChangeDirectory
+// Author	:	Nalin
+// Input	:	char *name
+// Output	:	Nothing
+// Description	:	It is used to change current directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ChangeDirectory(char *name)
+{
+    memset(currentDirectory, 0, strlen(currentDirectory));
+    strcpy(currentDirectory, name);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Name		:	GetCurrentDirectory
+// Author	:	Nalin
+// Input	:	Nothing
+// Output	:	const char *
+// Description	:	It is used to get current directory
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const char * GetCurrentDirectory()
+{
+    return currentDirectory;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

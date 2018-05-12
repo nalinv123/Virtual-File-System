@@ -43,7 +43,7 @@ int main()
 		fflush(stdin);
 		strcpy(str, "");
 
-		printf("\nVirtual File System : > ");
+		printf("\nVirtual File System : %s > ", GetCurrentDirectory());
 		fgets(str, 80, stdin);
 
 		count = sscanf(str, "%s%s%s%s", command[0], command[1], command[2], command[3]);
@@ -172,6 +172,8 @@ int main()
 				{
 					printf("\nERROR : It is not reguler file\n");
 				}
+
+				CloseFile(fd);
 			}
 			else if (strcasecmp(command[0], "truncate") == 0)
 			{
@@ -215,6 +217,35 @@ int main()
 					ls_All();
 				}
 				continue;
+			}
+			else if (strcasecmp(command[0], "mkdir") == 0)
+            {
+                ret = CreateDirectory(command[1]);
+                if (ret == -1)
+                {
+                    printf("\nERROR : Incorrect parameters\n");
+                }
+                else if (ret == -2)
+                {
+                    printf("\nERROR : There are no free inodes\n");
+                }
+                else if (ret == -3)
+                {
+                    printf("\nERROR : Directory already exists\n");
+                }
+                else if (ret == -4 || ret == -5)
+                {
+                    printf("\nERROR : Wrong path\n");
+                }
+                else if (ret == -6)
+                {
+                    printf("\nERROR : Memory allocation failure\n");
+                }
+                continue;
+            }
+            else if (strcasecmp(command[0], "cd") == 0)
+			{
+				ChangeDirectory(command[1]);
 			}
 			else
 			{
@@ -334,6 +365,7 @@ int main()
 					write(2, ptr, ret);
 					printf("\n");
 				}
+				CloseFile(fd);
 				continue;
 			}
 			else if (strcasecmp(command[0],"chmod") == 0)
